@@ -60,7 +60,6 @@ contract GeoLogixRefund {
             emit ComplianceStatusChanged(driverAddress, drivers[driverAddress].isInCompliance);
         }
         emit CoordinateIngested(driverAddress, lat, lon, timestamp);
-        // Update driver's rating based on their compliance
         if (drivers[driverAddress].isInCompliance) {
             drivers[driverAddress].rating += 1;
         } else {
@@ -74,6 +73,17 @@ contract GeoLogixRefund {
         require(driver.isRegistered, "Driver is not registered");
         return (driver.name, driver.lat, driver.lon, driver.allowedDistance, driver.requiredTime, driver.timeTolerance, driver.refundAmount, driver.rating, driver.tokens, driver.isInCompliance);
     }
+    function removeDriver(address driverAddress) public onlyOwner {
+        require(drivers[driverAddress].isRegistered, "Driver is not registered");
+        delete drivers[driverAddress];
+        for (uint i = 0; i < driverAddresses.length; i++) {
+            if (driverAddresses[i] == driverAddress) {
+                driverAddresses[i] = driverAddresses[driverAddresses.length - 1];
+                driverAddresses.pop();
+                break;
+            }
+        }
+    }
     function refund(address driverAddress) public onlyOwner payable {
         require(drivers[driverAddress].isRegistered, "Driver is not registered");
         require(drivers[driverAddress].isInCompliance, "Driver is not in compliance");
@@ -82,8 +92,7 @@ contract GeoLogixRefund {
     function reward(address driverAddress) public onlyOwner payable {
         require(drivers[driverAddress].isRegistered, "Driver is not registered");
         require(drivers[driverAddress].isInCompliance, "Driver is not in compliance");
-        // Reward driver with tokens based on their rating
-        uint256 rewardAmount = drivers[driverAddress].rating * 2; // Modify this as per your business logic
+        uint256 rewardAmount = drivers[driverAddress].rating * 2;
         token.transfer(driverAddress, rewardAmount);
         drivers[driverAddress].tokens += rewardAmount;
     }
