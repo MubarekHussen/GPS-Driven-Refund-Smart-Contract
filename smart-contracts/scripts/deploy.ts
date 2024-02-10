@@ -2,7 +2,7 @@ const hre = require("hardhat");
 
 async function main() {
   try {
-    const ownerAddress = "0x604B123b56B5c7CB3ef2793bCDA7C17c9674A4C0";
+    const ownerAddress = "0x154C319c0B1612130Cb6F5499eb1Cd0dbe054779";
     const [deployer] = await hre.ethers.getSigners();
     console.log("Deploying contracts with the account:", ownerAddress);
     console.log(deployer.address);
